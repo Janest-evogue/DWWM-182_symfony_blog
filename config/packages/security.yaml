@@ -1,17 +1,38 @@
 security:
+    # comment le mot de passe est encrypté
+    encoders:
+        App\Entity\User:
+            # argon2i par défaut
+            algorithm: auto
+
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        users_in_memory: { memory: null }
+        database:
+            # les utilisateurs viennent de l'entité User
+            # et l'identifiant est l'email
+            entity:
+                class: App\Entity\User
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             anonymous: lazy
-            provider: users_in_memory
+            # le fournisseur d'utilisateur défini dans providers
+            provider: database
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # route du formulaire de login
+            form_login:
+                login_path: app_user_login
+                check_path: app_user_login
+
+            # route de la page de déconnexion
+            logout:
+                path: app_user_logout
 
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
@@ -19,5 +40,5 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
