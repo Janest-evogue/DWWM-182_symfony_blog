@@ -8,4 +8,7 @@
     {% if category.description is not empty %}
         <p>{{ category.description|nl2br }}</p>
     {% endif %}
+
+    <h2>Derniers articles dans cette rubrique</h2>
+    {% include 'article/_list.html.twig' with {'articles': articles} only %}
 {% endblock %}

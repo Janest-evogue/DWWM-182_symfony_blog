@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+    <h1>{{ article.title }}</h1>
+
+    <p>
+        Par {{ article.author }},
+        <em>{{ article.publicationDate|date('d/m/Y H:i') }}</em>
+        <br>
+        <strong>
+            Dans
+            <a href="{{ path('app_category_index', {'id': article.category.id}) }}">
+                {{ article.category }}
+            </a>
+        </strong>
+    </p>
+
+    {% if article.image is not null %}
+        <div>
+            <img src="{{ asset('images/' ~ article.image) }}" width="100%">
+        </div>
+    {% endif %}
+
+    {{ article.content|nl2br }}
+{% endblock %}

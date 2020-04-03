@@ -17,3 +17,6 @@
 
 # PHPStorm
 /.idea/
+
+# répertoire d'upload d'images
+/public/images/
