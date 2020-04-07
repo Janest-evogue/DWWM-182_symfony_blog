@@ -6,12 +6,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Form\SearchArticleType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,14 +28,27 @@ class ArticleController extends AbstractController
     /**
      * @Route("/")
      */
-    public function index(ArticleRepository $repository)
+    public function index(Request $request, ArticleRepository $repository)
     {
-        $articles = $repository->findBy([], ['publicationDate' => 'DESC']);
+        $searchForm = $this->createForm(SearchArticleType::class);
+
+        $searchForm->handleRequest($request);
+
+        // les données reçues par le formulaire
+        dump($searchForm->getData());
+
+        // sans formulaire de recherche
+        //$articles = $repository->findBy([], ['publicationDate' => 'DESC']);
+
+        // (array) pour forcer le typage, permet de passer un array au lieu de null
+        // dans le cas où il n'y a pas de recherche
+        $articles = $repository->search((array)$searchForm->getData());
 
         return $this->render(
             'admin/article/index.html.twig',
             [
-                'articles' => $articles
+                'articles' => $articles,
+                'search_form' => $searchForm->createView()
             ]
         );
     }
@@ -138,7 +153,11 @@ class ArticleController extends AbstractController
     {
         // suppression de l'image si l'article en a une
         if (!is_null($article->getImage())) {
-            unlink($this->getParameter('upload_dir') . $article->getImage());
+            $image = $this->getParameter('upload_dir') . $article->getImage();
+
+            if (file_exists($image)) {
+                unlink($image);
+            }
         }
 
         // suppression en bdd
@@ -148,5 +167,13 @@ class ArticleController extends AbstractController
         $this->addFlash('success', "L'article est supprimé");
 
         return $this->redirectToRoute('app_admin_article_index');
+    }
+
+    /**
+     * @Route("/ajax-content/{id}")
+     */
+    public function ajaxContent(Article $article)
+    {
+        return new Response(nl2br($article->getContent()));
     }
 }

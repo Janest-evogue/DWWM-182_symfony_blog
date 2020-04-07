@@ -36,41 +36,47 @@
                 </div>
             </nav>
         {% endif %}
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="{{ path('app_index_index') }}">Blog</a>
-                {# affiche le rendu de la méthode menu() de CategoryController #}
-                {{ render(controller('App\\Controller\\CategoryController::menu')) }}
-                <ul class="navbar-nav">
-                    {# app.user = l'utilisateur connecté #}
-                    {% if app.user is null %}
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <div class="container">
+                    <a class="navbar-brand" href="{{ path('app_index_index') }}">Blog</a>
+                    {# affiche le rendu de la méthode menu() de CategoryController #}
+                    {{ render(controller('App\\Controller\\CategoryController::menu')) }}
+                    <ul class="navbar-nav">
+                        {# app.user = l'utilisateur connecté #}
+                        {% if app.user is null %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_user_register') }}">
+                                    Inscription
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_user_login') }}">
+                                    Connexion
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <span class="navbar-text">
+                                    {{ app.user }}
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_user_logout') }}">
+                                    Déconnexion
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_user_register') }}">
-                                Inscription
+                            <a class="nav-link" href="{{ path('app_index_contact') }}">
+                                Contact
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_user_login') }}">
-                                Connexion
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <span class="navbar-text">
-                                {{ app.user }}
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_user_logout') }}">
-                                Déconnexion
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
-        <div class="container">
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <main class="container">
             {# affichage des messages flash #}
             {% for type, messages in app.session.flashBag.all %}
                 {# pour la classe alert-danger de bootstrap #}
@@ -84,7 +90,7 @@
                 {% endfor %}
             {% endfor %}
             {% block body %}{% endblock %}
-        </div>
+        </main>
         {% block javascripts %}
             <script
                 src="https://code.jquery.com/jquery-3.4.1.min.js"

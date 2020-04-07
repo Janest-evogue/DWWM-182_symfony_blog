@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -50,12 +52,26 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
+     * @Assert\File(mimeTypes={"image/png", "image/jpeg"},
+     *     mimeTypesMessage="Le fichier doit être une image JPG ou PNG",
+     *     maxSize="600k",
+     *     maxSizeMessage="L'image ne doit pas dépasser {{ limit }}{{ suffix }}")
      */
     private $image;
+
+    /**
+     * cascade={"remove"} : quand on supprime un article, ça supprime ses commentaires en même temps
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="article", cascade={"remove"})
+     * tri par défaut quand on appelle le getter :
+     * @ORM\OrderBy({"publicationDate": "DESC"})
+     */
+    private $comments;
 
     public function __construct()
     {
         $this->setPublicationDate(new \DateTime());
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +147,37 @@ class Article
     public function setImage($image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getArticle() === $this) {
+                $comment->setArticle(null);
+            }
+        }
 
         return $this;
     }

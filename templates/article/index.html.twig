@@ -24,4 +24,36 @@
     {% endif %}
 
     {{ article.content|nl2br }}
+
+    <h2>Commentaires</h2>
+
+    {% if app.user is null %}
+        <div class="alert alert-info">
+            Vous devez être connecté pour écrire un commentaire.
+        </div>
+    {% else %}
+        {{ form_start(form) }}
+
+        {{ form_row(form.content) }}
+
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary">
+                Envoyer
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    {% endif %}
+
+    {% for comment in article.comments %}
+        <h5>
+            {{ comment.user }}
+            <small>{{ comment.publicationDate|date('d/m/Y H:i') }}</small>
+        </h5>
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                {{ comment.content|nl2br }}
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

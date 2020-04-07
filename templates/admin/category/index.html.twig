@@ -25,7 +25,7 @@
                        href="{{ path('app_admin_category_edit', {'id': category.id}) }}">
                         Modifier
                     </a>
-                    <a class="btn btn-danger"
+                    <a class="btn btn-danger btn-delete"
                        href="{{ path('app_admin_category_delete', {'id': category.id}) }}">
                         Supprimer
                     </a>
@@ -33,4 +33,39 @@
             </tr>
         {% endfor %}
     </table>
+
+    <div class="modal" tabindex="-1" role="dialog" id="modal-delete">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>Etes-vous sûr de vouloir supprimer cette catégorie ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btn-confirm-delete">Oui</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(function () { // DOM ready
+            $('.btn-delete').click(function (event) {
+                event.preventDefault();
+
+                var $btn = $(this);
+
+                $('#modal-delete').modal('show');
+
+                $('#btn-confirm-delete').click(function () {
+                    window.location.href = $btn.attr('href');
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
